@@ -60,6 +60,8 @@ if __name__ == '__main__':
             model_indicator = 'C'
         elif args.model == 'CNN4':
             model_indicator = 'D'
+        elif args.model == 'resnet18':
+            model_indicator = 'E'
         else:
             print('wrong model name')
         client_model_dict = {}
@@ -89,8 +91,9 @@ if __name__ == '__main__':
         print('communication round: {} \n'.format(epoch))
 
         # global_model.train()
-        m = max(int(args.frac * args.num_users), 1)
-        idxs_users = np.random.choice(range(args.num_users), m, replace = False)
+        # m = max(int(args.frac * args.num_users), 1)
+        # idxs_users = np.random.choice(range(args.num_users), m, replace = False)
+        idxs_users = range(args.num_users)
         # previous_user_list = idxs_users
         
         for idx in idxs_users:
@@ -102,6 +105,7 @@ if __name__ == '__main__':
 
             # if args.customize_test:
             if epoch == 0:
+                print(idxs_users)
                 w, loss = local_model.update_weights(model = copy.deepcopy(model_assign_dict[idx]), global_round = epoch)
                 trained_local_model = copy.deepcopy(model_assign_dict[idx])
                 trained_local_model.load_state_dict(w)

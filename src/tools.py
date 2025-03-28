@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision.models as t_models
 
 def splitList (lst, n):
     it = iter(lst)
@@ -13,7 +14,7 @@ def splitList (lst, n):
 
 def model_generation(client_number):
 
-    model_short_name = ['CNN1', 'CNN2', 'CNN3', 'CNN4']
+    model_short_name = ['CNN1', 'CNN2', 'CNN3', 'CNN4', 'resnet18']
     
     client_index_list = [i for i in range(client_number)]
     new_list = splitList(client_index_list, 3)
@@ -33,6 +34,8 @@ def model_assign(client_number, client_id):
         client_model = CNN3()
     if model_generation(client_number)[client_id] == 'CNN4':
         client_model = CNN4()
+    if model_generation(client_number)[client_id] == 'resnet18':
+        client_model = ResNet18(10) 
     # if model_generation(client_number)[client_id] == 'CNN1':
     #     client_model = CNN5()
     return client_model
@@ -870,3 +873,13 @@ class CNN4(nn.Module):
         x = self.fc2(x)
         # Apply log softmax activation to the output
         return self.linear(x)
+    
+class ResNet18(nn.Module):
+    def __init__(self, _number_of_classes: int):
+        super(ResNet18, self).__init__()
+        self._number_of_classes = _number_of_classes
+        self.resnet = t_models.resnet18(pretrained=False)
+        self.resnet.fc = nn.Sequential(nn.Linear(512, self._number_of_classes))
+    
+    def forward(self, x):
+        return self.resnet(x)
